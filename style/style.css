@@ -26,7 +26,7 @@
 	display: inline-flex;
 	background-color: rgba(0,0,0, 0.9);
 	opacity: 0.8;
-	width: 1500px;
+	width: 1360px;
 	height: 92px;
 }
 .second-box a{
@@ -68,7 +68,7 @@
 /*head image over*/
 /*WE ARE TASTY start*/
 .background1{
-	width: 1500px;
+	width: 1360px;
 	height: : 615px;
 	background-color: #F0F0F0;
 	display: inline-flex;
@@ -77,6 +77,10 @@
 	margin-top: 120px;
 	margin-bottom: 120px;
 	margin-left: 200px;
+}
+.img5{
+  position: absolute;
+  display: block;
 }
 .text5{
   text-align: center;
@@ -89,6 +93,7 @@
 .text6{
   margin-top: 20px;
   font-size: 20px;
+  width: 650px;
   position: absolute;
   top: 1000px;
   left: 650px;
@@ -101,7 +106,7 @@
   border-radius: 10px;
   height: 45px;
   width: 162px;
-  margin-top: 365px;
+  margin-top: 465px;
   margin-left: 80px;
 }
 .text8{
@@ -133,15 +138,17 @@
   margin-left: 40px;
 }
 .text10{
-	margin-left: 40px;
-	margin-top: 5px;
+	margin-left: 80px;
+	margin-top: 40px;
 	font-size: 40px;
 	padding-right: 10px;
 }
 .text11{
-	margin-left: 40px;
+	font-weight: bold;
+  font-size: 30px;
+  margin-left: 40px;
 	font-size: 15px;
-	margin-top: 40px;
+	margin-top: 10px;
 	padding-right: 30px;
 }
 .text12{ 
@@ -157,7 +164,220 @@
 
 }
 .img7{
-    margin-left: 570px;
-    margin-top: -400px;
+    margin-left: 505px;
+   top: -380px;
+    position: relative;
 }
 /*SPECIA RECIEPT over*/
+/*EXPERIENCE start*/
+.background4{
+	background-color: #F2F2F2;
+    height: 1000px;
+    position: absolute;
+    margin-top: 785px;
+    width: 1360px;
+}
+.text13{
+  text-align: center;	
+  font-size: 30px;
+  margin-top: 120px;
+ 
+}
+.text14{
+	margin-top: 10px;
+	font-size: 32px;
+    text-align: center;
+}
+.img15{
+	position: absolute;
+
+}
+.imgbox{
+	margin-top: 67px;
+	margin-left: 87px;
+}
+.imgbox2{
+	margin-top: 70px;
+}
+.text15{
+	font-size: 20px;
+	color: #fff;
+	margin-top: 50px;
+	text-align: center;
+
+}
+.background15{
+	background-color: rgba(0,0,0, 0.77);
+	width: 210px;
+	height: 230px;
+	position: absolute;
+	top: 298px;
+    left: 746px;
+
+}
+
+
+/*EXPERIENCE over*/
+/*DELICIOUS start*/
+
+.img16{
+  position: absolute;
+    margin-top: 60px;
+}
+.backgroun3{
+  background-color: #F3F3F3;
+  margin-left: 560px;
+    position: absolute;
+    width: 532px;
+    height: 464px;
+    margin-top: 660px;
+}
+
+.backgrou3{
+  background-color: #F3F3F3;
+  margin-left: 134px;
+    position: absolute;
+    width: 532px;
+    height: 464px;
+    margin-top: 1200px;
+}
+.im7{
+   margin-top: -400px;
+    margin-left: -420px;
+    
+}
+.tex9{
+  font-size: 30px;
+  margin-top: 40px;
+  margin-left: 40px;
+}
+.tex10{
+  margin-left: 40px;
+  margin-top: 5px;
+  font-size: 40px;
+  padding-right: 10px;
+}
+.tex11{
+  margin-left: 40px;
+  font-size: 15px;
+  margin-top: 40px;
+  padding-right: 30px;
+}
+.tex12{ 
+  margin-top: 10px;
+  background-color: #E7A331;
+  color: #fff;
+  font-size: 15px;
+  border-radius: 10px;
+  height: 45px;
+  width: 162px;
+  margin-top: 78px;
+  margin-left: 40px;
+}
+.icon{
+  margin-top: 10px;
+}
+
+
+
+
+/*DELICIOUS over*/
+/*MOBILE APP start*/
+.img17{
+  margin-top: 1758px;
+  position: absolute;
+}
+.img19{
+    margin-left: 300px;
+    top: 3000px;
+    position: absolute;
+}
+.img18{
+    top: 1931px;
+    position: relative;
+    margin-left: 342px;
+}
+.img20{
+    top: 1931px;
+    position: relative;
+    margin-left: 88px;
+}
+.text15{
+    margin-left: 80px;
+    margin-top: 40px;
+    position: relative;
+    padding-right: 10px;
+    font-size: 29px;
+    margin-top: 1618px;
+}
+.text16{
+    margin-left: 596px;
+    position: relative;
+    padding-right: 10px;
+    font-size: 99px;
+    color: white;
+    
+}
+.text17{
+    margin-left: 596px;
+    position: relative;
+    padding-right: 10px;
+    font-size: 30px;
+    color: white;
+    
+}
+/*MOBILE APP over*/
+/*CONTACT FORM START*/
+.igg{
+  position: absolute;
+  margin-top: 4268px;
+  margin-left: -20px;
+}
+.head-text{
+  margin-left: 200px;
+}
+.box-of-three{
+      position: relative;
+    margin-top: 4300px;
+    margin-left: -110px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 30px;
+}
+.description1{
+  margin-left: 200px; 
+  font-size: 20px;
+  margin-top: 70px;
+  text-align: center;
+}
+.description2{
+  margin-left: 160px; 
+  font-size: 20px;
+  margin-top: 50px;
+  text-align: center;
+}
+.box-three{
+ display: block;
+ width: 200px;
+ 
+}
+.inputs{
+  margin-left: 150px;
+
+}
+.holder-text{
+  border-radius: 10px;
+  background-color: #333;
+  margin-top: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 300px;
+  border:0px;
+
+}
+.holder-text2{
+  padding-top: 25px;
+  padding-bottom: 25px;
+  width: 300px;
+}
+/*CONTACT FORM OVER*/
