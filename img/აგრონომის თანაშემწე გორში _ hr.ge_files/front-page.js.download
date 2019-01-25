@@ -1,0 +1,123 @@
+function toggleFav(element, announcementId, updateCounter) {
+    var key = "FV_" + __currentUserId;
+    var currentFavoritesRaw = getCookie(key);
+    var currentFavorites = (currentFavoritesRaw != null && currentFavoritesRaw != "") ? currentFavoritesRaw.split("|") : [];
+    var updatedFavorites = updateFavorites(announcementId, currentFavorites);
+    var updatedFavoriesRaw = updatedFavorites.join("|");
+    setCookie(key, updatedFavoriesRaw, { expires: 3600 * 24 * 365, path: '/' });
+    toggleClassName(element, updateCounter);
+}
+function toggleClassName(element, updateCounter) {
+    var fv = +(document.getElementById('fv-count') || { innerHTML: "0" }).innerHTML;
+    var targetElement = element.querySelector('i');
+    if (targetElement.className.indexOf('fa-heart-o') != -1) {
+        targetElement.className = 'fa fa-heart';
+        fv++;
+    }
+    else {
+        targetElement.className = 'fa fa-heart-o';
+        fv--;
+    }
+    if (updateCounter) {
+        document.getElementById('fv-count').innerHTML = (fv == 0 ? "" : fv.toString());
+    }
+}
+function updateFavorites(announcementId, currentFavorites) {
+    var existingIndex = currentFavorites.indexOf(announcementId.toString());
+    if (existingIndex != -1) {
+        currentFavorites.splice(existingIndex, 1);
+    }
+    else {
+        currentFavorites.push(announcementId);
+    }
+    return currentFavorites;
+}
+function getCookie(name) {
+    var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+    return matches ? matches[1] : undefined;
+}
+function setCookie(name, value, options) {
+    options = options || {};
+    var expires = options.expires;
+    if (typeof expires == "number" && expires) {
+        var d = new Date();
+        d.setTime(d.getTime() + expires * 1000);
+        expires = options.expires = d;
+    }
+    if (expires && expires.toUTCString) {
+        options.expires = expires.toUTCString();
+    }
+    var updatedCookie = name + "=" + value;
+    for (var propName in options) {
+        updatedCookie += "; " + propName;
+        var propValue = options[propName];
+        if (propValue !== true) {
+            updatedCookie += "=" + propValue;
+        }
+    }
+    document.cookie = updatedCookie;
+}
+$(function () {
+    var totalItems = $('.item').length;
+    if (totalItems < 6) {
+        $('#companySlider').carousel({
+            pause: true,
+            interval: false,
+        });
+    }
+    else
+        $('#companySlider').carousel({
+            pause: true,
+            interval: 4000,
+        });
+});
+$(function () {
+    $(document).ready(function () {
+        var el = $(".owl-carousel");
+        if (el[0] != null) {
+            el.owlCarousel({
+                loop: $(".owl-demo > div").length > 6 ? true : false,
+                margin: 1,
+                nav: true,
+                dots: false,
+                items: 6,
+                responsive: {
+                    0: {
+                        items: 1,
+                        loop: $(".owl-demo > div").length > 1 ? true : false,
+                        autoplay: $(".owl-demo > div").length > 1 ? true : false,
+                    },
+                    350: {
+                        items: 2,
+                        loop: $(".owl-demo > div").length > 2 ? true : false,
+                        autoplay: $(".owl-demo > div").length > 2 ? true : false,
+                    },
+                    500: {
+                        items: 3,
+                        loop: $(".owl-demo > div").length > 3 ? true : false,
+                        autoplay: $(".owl-demo > div").length > 3 ? true : false,
+                    },
+                    670: {
+                        items: 4,
+                        loop: $(".owl-demo > div").length > 4 ? true : false,
+                        autoplay: $(".owl-demo > div").length > 4 ? true : false,
+                    },
+                    1000: {
+                        items: 5,
+                        loop: $(".owl-demo > div").length > 5 ? true : false,
+                        autoplay: $(".owl-demo > div").length > 5 ? true : false,
+                    },
+                    1200: {
+                        items: 6
+                    }
+                },
+                navText: ["<i class='fa fa-chevron-left'></i>", "<i class='fa fa-chevron-right'></i>"],
+                autoplay: $(".owl-demo > div").length > 6 ? true : false,
+                autoplayTimeout: 3000,
+                autoplayHoverPause: false
+            });
+        }
+    });
+});
+
+//# sourceMappingURL=maps/front-page.js.map

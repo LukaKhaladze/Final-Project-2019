@@ -1,0 +1,276 @@
+define(
+	'patron.v2.layer/cleaner/Cleaner.Stat',
+	[
+		'patron.v2.layer/cleaner/Cleaner.API',
+		'patron.v2.layer/cleaner/Cleaner.Folders',
+		'patron.v2.layer/cleaner/Cleaner.Radar',
+		'patron.v2/flags/flags'
+	],
+function (API, Folders, Radar, flags) {
+	var dfd;
+
+	return {
+
+		fetch: function (settings) {
+			settings = settings || {};
+			dfd = $.Deferred();
+
+			$.when.apply($, [
+				API.mailliststat(settings),
+				!settings.without_filters && API.getFilters()
+			])
+				.done(this._process.bind(this))
+				.fail(function(err) {
+					dfd.reject(err)
+				})
+			;
+
+			return dfd.promise();
+		},
+
+		_process: function (mailliststat, filters) {
+			var data = {
+				stat: mailliststat.maillings_stat,
+				filters_exists: false,
+				senders: []
+			},
+			uniqueSenders = {},
+			isRu = this.isRu();
+
+			Array.forEach(mailliststat.maillings_senders, function (sender) {
+				var senderHash = sender.name_en + '|' +  sender.category_id,
+					uniqueSender = uniqueSenders[senderHash],
+					total_letters = parseInt(sender.total_letters, 10);
+
+				// Рассыльщики без категории или с категорией 0 не должны обрабатываться утилитой
+				if (!parseInt(sender.category_id || '0', 10)) {
+					return;
+				}
+
+				// //MAIL-37057
+				if (patron.MailBoxInboxCategory &&
+					parseInt(sender.category_id, 10) > parseInt(patron.MailBoxInboxCategory, 10)) {
+					sender.exist_folder_id = Folders.INBOX;
+				}
+
+				if (!uniqueSender) {
+					uniqueSenders[senderHash] = Object.extend({}, sender, {
+						emails: [sender.emails],
+						ids: [sender.id],
+						total_letters: total_letters,
+						name: sender[isRu ? 'name_ru' : 'name_en']
+					});
+					delete uniqueSenders[senderHash].id;
+				} else {
+					uniqueSender.emails.push(sender.emails);
+					uniqueSender.ids.push(sender.id);
+					uniqueSender.total_letters += total_letters;
+				}
+			});
+
+			Object.forEach(uniqueSenders, function (sender) {
+				data.senders.push(sender);
+			});
+
+			data.senders.sort(function (sender1, sender2) {
+				return sender2.total_letters - sender1.total_letters;
+			});
+			if (filters && filters.length) { // For second use
+				Array.forEach(data.senders, function (sender) {
+					var senderFilterExist = false; // Существование фильтра для данного отправителя
+
+					Array.forEach(filters, function (filter) {
+
+						var filterEmails = Array.map(filter.conditions, function (cond) {
+								return cond.value;
+							}).sort().join(''),
+							senderEmails = sender.emails.sort().join('');
+
+						if (senderEmails == filterEmails) {
+							filter.sender_exists = true;
+
+							sender.filter_id = filter.id;
+							sender.exist_folder_id = filter.actions.move;
+							sender.makeread = filter.actions.read;
+							senderFilterExist = true;
+						}
+					});
+
+					if (!senderFilterExist) { // Не смогли найти фильтр, оставляем оотправителя во Входящих
+						sender.exist_folder_id = Folders.INBOX;
+					} else {
+						data.filters_exists = true;
+					}
+				});
+
+				/*Если нашлись фильтры без соответсвующих рассыльщиков в mailliststat*/
+				var filter_without_sender = false;
+				Array.forEach(filters, function (filter) {
+					if (!filter.sender_exists) {
+						filter_without_sender = true;
+
+						var emails = Array.map(filter.conditions, function (cond) {
+								return cond.value;
+							}).sort();
+
+						data.senders.unshift({
+							autofilter_refuse: false,
+							category_id: 0,
+							emails: emails,
+							exist_folder_id: filter.actions.move,
+							filter_id: filter.id,
+							ids: [],
+							makeread: filter.actions.read,
+							name: emails.join(', '),
+							name_en: emails.join(', '),
+							name_ru: emails.join(', '),
+							total_letters: 0
+						});
+					}
+				});
+				if (filter_without_sender) {
+					Radar.send('filter_without_sender');
+				}
+			}
+
+			dfd.resolve(data);
+		},
+
+		_procesWidget: function (data) {
+			var stat = data.stat,
+				all = stat.deleted + stat.ignored + stat.ignored_deleted + stat.read,
+				unreadPercent = Math.round(((stat.ignored_deleted + stat.ignored) / all)*100),
+				utilFlag = flags.get('mailbox-sort'),
+				isRu = this.isRu();
+
+			return {
+				messages: all,
+				unread: unreadPercent,
+				secondUse: data.filters_exists,
+				notready: !utilFlag.isActive() && utilFlag.getCount('show') === 0,
+				folders: (function () {
+					var folders = {},
+						arr = [];
+
+					if (!data.filters_exists) {
+						return [];
+					}
+
+					Array.forEach(data.senders, function (sender) {
+						if (sender.filter_id) {
+							var key = sender.exist_folder_id;
+
+							if (!folders[key]) {
+								folders[key] = {
+									id: key,
+									isDeletable: !Folders.isRestricted(+key) && !Folders.is(+key, 'Spam'),
+									filters: [sender.filter_id],
+									senders: [sender.name],
+									makeread: sender.makeread,
+									name: patron.Folders.getAll().getSafe(sender.exist_folder_id).get('name')
+								};
+							} else if (folders[key]) {
+								folders[key].filters.push(sender.filter_id);
+								folders[key].senders.push(sender.name);
+							}
+						}
+					});
+
+					Object.forEach(folders, function (folder) {
+						//folder.senders = folder.senders.join(', ');
+						arr.push(folder);
+					});
+
+					return arr;
+				})()
+			};
+		},
+
+		_processLetterPlate: function (data, sender_id) {
+			var result = null,
+				utilFlag = flags.get('mailbox-sort'),
+				isUtilReady = utilFlag.isActive() || utilFlag.getCount('show') !== 0,
+				isSenderInbox = false;
+
+			var sender = Array.filter(data.senders, function (item) {
+				return Array.contains(item.ids, +sender_id);
+			});
+
+			sender = sender.length ? sender[0] : null;
+
+			if (sender) {
+				isSenderInbox = patron.MailBoxInboxCategory && parseInt(sender.category_id, 10) > parseInt(patron.MailBoxInboxCategory, 10);
+			}
+
+			if (isUtilReady && sender && !isSenderInbox && !sender.autofilter_refuse && !sender.filter_exist && !sender.autofilter_exist &&  sender.total_letters) {
+				result = sender;
+			}
+
+			return result;
+		},
+
+		_processLettersInformer: function (data, folder_id) {
+			return {
+				autofiltered_senders: Array.filter(data.senders, function (item) {
+					if (item.autofilter_exist ===  +folder_id) {
+						return item;
+					}
+				}),
+				filtered_senders: Array.filter(data.senders, function (item) {
+					if (item.filter_exist ===  +folder_id) {
+						return item;
+					}
+				})
+			};
+		},
+
+		fetchWidgetData: function () {
+			var wDfd = $.Deferred();
+
+			this.fetch()
+				.done(function (data) {
+					wDfd.resolve(this._procesWidget(data));
+				}.bind(this))
+
+				.fail(function(err) {
+					wDfd.reject(err);
+				})
+			;
+
+			return wDfd.promise();
+		},
+
+		fetchLetterPlateData: function (sender_id) {
+			var wDfd = $.Deferred();
+
+			this.fetch({
+				cache: true,
+				without_filters: true
+			})
+			.done(function (data) {
+				wDfd.resolve(this._processLetterPlate(data, sender_id));
+			}.bind(this))
+			.fail(wDfd.reject);
+
+			return wDfd.promise();
+		},
+
+		fetchLettersInformerData: function (folderId, options) {
+			var wDfd = $.Deferred();
+
+			this.fetch($.extend({
+				cache: true,
+				without_filters: true
+			}, options)).done(function (data) {
+				wDfd.resolve(this._processLettersInformer(data, folderId));
+			}.bind(this));
+
+			return wDfd.promise();
+		},
+
+		isRu: function () {
+			return Array.indexOf(['ru_RU', 'uk_UA', 'be_BY', 'kk_KZ'], patron.LANG) !== -1;
+		}
+	};
+
+});

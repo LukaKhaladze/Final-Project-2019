@@ -1,0 +1,1 @@
+require(["jquery","ajs/pkg"],function(a,b){var $=a;define("patron.build/PaymentsLetter",["2kit","payments.letter","react.env"],function(a,b){return b});window.$=window.jQuery=a});

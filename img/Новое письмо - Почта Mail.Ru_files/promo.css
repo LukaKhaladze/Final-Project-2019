@@ -1,0 +1,544 @@
+@-webkit-keyframes balloon-icon_zoom-in {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.1) rotate(-90deg);
+    -moz-transform: scale(0.1) rotate(-90deg);
+    -ms-transform: scale(0.1) rotate(-90deg);
+    -o-transform: scale(0.1) rotate(-90deg);
+    transform: scale(0.1) rotate(-90deg); }
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1) rotate(0);
+    -moz-transform: scale(1) rotate(0);
+    -ms-transform: scale(1) rotate(0);
+    -o-transform: scale(1) rotate(0);
+    transform: scale(1) rotate(0); } }
+
+@keyframes balloon-icon_zoom-in {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.1) rotate(-90deg);
+    -moz-transform: scale(0.1) rotate(-90deg);
+    -ms-transform: scale(0.1) rotate(-90deg);
+    -o-transform: scale(0.1) rotate(-90deg);
+    transform: scale(0.1) rotate(-90deg); }
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1) rotate(0);
+    -moz-transform: scale(1) rotate(0);
+    -ms-transform: scale(1) rotate(0);
+    -o-transform: scale(1) rotate(0);
+    transform: scale(1) rotate(0); } }
+
+.balloon {
+  position: absolute;
+  width: 233px;
+  overflow: hidden;
+  color: #000;
+  font: 12px/1.25 Arial, Helvetica, sans-serif;
+  z-index: 200;
+  white-space: normal; }
+  .balloon_effect-show .balloon__message {
+    -webkit-animation: opacity_0-0_100-100 0.5s forwards ease-out;
+    -moz-animation: opacity_0-0_100-100 0.5s forwards ease-out;
+    -ms-animation: opacity_0-0_100-100 0.5s forwards ease-out;
+    -o-animation: opacity_0-0_100-100 0.5s forwards ease-out;
+    animation: opacity_0-0_100-100 0.5s forwards ease-out; }
+  .balloon_effect-show .icon {
+    -webkit-animation: balloon-icon_zoom-in 0.5s forwards ease-out;
+    -moz-animation: balloon-icon_zoom-in 0.5s forwards ease-out;
+    -ms-animation: balloon-icon_zoom-in 0.5s forwards ease-out;
+    -o-animation: balloon-icon_zoom-in 0.5s forwards ease-out;
+    animation: balloon-icon_zoom-in 0.5s forwards ease-out; }
+
+.balloon__i {
+  overflow: hidden;
+  position: relative; }
+
+.balloon__wrap__medialine .icon-wrap {
+  padding-top: 0; }
+
+.balloon__collector_folder-list {
+  position: absolute;
+  margin: 15px 0px 0 47px; }
+
+/*
+ * _balloon_letters-head-actions
+ */
+.balloon__title {
+  margin-bottom: 12px;
+  font-size: 18px; }
+
+.balloon__list-item {
+  margin: 6px 0;
+  font-size: 13px; }
+
+.balloon__list-item__ico {
+  display: inline-block;
+  width: 22px;
+  height: 20px; }
+  .balloon__list-item__ico .ico_folder:before {
+    color: #ced2d6; }
+
+.balloon__cn {
+  position: absolute;
+  height: 20px;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background: url("//img.imgsmail.ru/r/default/balloon/baloon.344.png") no-repeat 0 0; }
+  .balloon__cn_tl {
+    margin: 0 0 0 -45px; }
+  .balloon__cn_tr {
+    left: -45px;
+    width: 45px;
+    margin: 0 0 0 100%; }
+  .balloon__cn_bl {
+    margin: 0 0 0 -45px;
+    background-position: 0 -59px; }
+  .balloon__cn_br {
+    left: -45px;
+    width: 45px;
+    margin: 0 0 0 100%;
+    background-position: 0 -20px; }
+  .balloon__cn_tc {
+    display: none;
+    left: 50%;
+    width: 20px;
+    background-position: 0 -78px; }
+  .balloon__cn_lc {
+    display: none;
+    left: 0;
+    top: 50%;
+    margin-top: -8px;
+    width: 12px;
+    height: 24px;
+    background-position: -40px -80px; }
+  .balloon__cn_rc {
+    display: none;
+    left: -12px;
+    top: 50%;
+    width: 12px;
+    height: 24px;
+    margin: -8px 0 0 100%;
+    background-position: -80px -80px; }
+
+.balloon__content {
+  background: #fff;
+  margin: 0 11px;
+  padding: 3px 20px 2px 10px; }
+  .balloon__content_icon {
+    float: left;
+    padding: 0 10px 0 0; }
+
+.balloon__icon {
+  position: absolute;
+  right: 18px;
+  top: 4px;
+  height: 9px;
+  width: 9px;
+  overflow: hidden;
+  line-height: 9px; }
+
+.balloon__icon i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 9px;
+  width: 9px;
+  overflow: hidden;
+  background: url("//img.imgsmail.ru/r/ru/close.png") no-repeat 0 0;
+  cursor: pointer; }
+
+.balloon__lb .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon__lb .balloon__cn_lc {
+  display: block;
+  top: 75%; }
+
+.balloon__lc .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon__lc .balloon__cn_lc {
+  display: block; }
+
+.balloon__lt .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon__lt .balloon__cn_lc {
+  display: block;
+  top: 25%; }
+
+.balloon__message {
+  overflow: hidden;
+  min-height: 45px; }
+  .balloon__message_beta-settings {
+    color: #333333;
+    font-size: 15px;
+    line-height: 20px;
+    padding-left: 10px; }
+
+.balloon__message .balloon__message__head {
+  margin-bottom: 0.2em;
+  font-weight: bold; }
+
+.balloon__message .balloon__message__text {
+  margin-bottom: 0.2em; }
+
+.balloon__message__list {
+  margin: 0;
+  padding: 0 10px 0 40px; }
+
+.balloon__message__list__item {
+  margin: 0;
+  padding: 0 0 10px 0; }
+
+.balloon__message__interactive {
+  font-weight: bold; }
+
+.balloon__message_bonus-promo {
+  padding-top: 7px; }
+  .balloon__message_bonus-promo .balloon__message-header {
+    color: #333333;
+    display: block;
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 20px; }
+  .balloon__message_bonus-promo .balloon__message-text {
+    color: #333333;
+    font-size: 13px;
+    line-height: 18px;
+    margin-top: 10px; }
+  .balloon__message_bonus-promo .btn {
+    font-size: 15px;
+    margin-bottom: 12px;
+    white-space: nowrap; }
+
+.balloon__message_metathreads {
+  color: #333333;
+  font-size: 15px;
+  line-height: 20px;
+  padding-left: 6px; }
+  .balloon__message_metathreads .balloon__message__head {
+    margin-top: 3px;
+    margin-bottom: 4px; }
+  .balloon__message_metathreads .balloon__message__text {
+    margin-bottom: 8px; }
+
+.balloon__message_octavius {
+  color: #333333;
+  font-size: 15px;
+  line-height: 20px;
+  padding-left: 6px; }
+  .balloon__message_octavius .balloon__message__head {
+    margin-top: 3px;
+    margin-bottom: 4px; }
+  .balloon__message_octavius .balloon__message__text {
+    margin-bottom: 8px; }
+
+.balloon__rb .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon__rb .balloon__cn_rc {
+  display: block;
+  top: 75%; }
+
+.balloon__rc .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon__rc .balloon__cn_rc {
+  display: block; }
+
+.balloon__rt .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon__rt .balloon__cn_rc {
+  display: block;
+  top: 25%; }
+
+.balloon__sh {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7px;
+  height: 700px;
+  background: url("//img.imgsmail.ru/r/default/balloon/baloon_left.png") no-repeat 0 0; }
+  .balloon__sh_l {
+    left: 4px; }
+  .balloon__sh_r {
+    left: -11px;
+    margin: 0 0 0 100%;
+    background-position: -7px 0; }
+
+.balloon__t, .balloon__b {
+  height: 20px;
+  position: relative;
+  z-index: 3;
+  margin: 0 4px;
+  overflow: hidden; }
+
+.balloon_br .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon_br .balloon__cn_br {
+  background-position: 0 -59px; }
+
+.balloon_bl .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon_bl .balloon__cn_bl {
+  background-position: 0 -20px; }
+
+.balloon_tc .balloon__cn_tl {
+  background-position: 0 -39px; }
+
+.balloon_tc .balloon__cn_tr {
+  background-position: 0 0; }
+
+.balloon_tc .balloon__cn_tc {
+  display: block; }
+
+.balloon_tr .balloon__cn_tl, .balloon_tr .balloon__cn_tr {
+  background-position: 0 -39px; }
+
+.icon-wrap_balloon {
+  float: left;
+  padding-top: 7px;
+  padding-left: 0;
+  padding-right: 9px; }
+
+.icon_balloons {
+  height: 14px;
+  margin-top: -7px;
+  margin-bottom: -7px;
+  background-image: url("//img.imgsmail.ru/r/default/ico/ico__balloons.png"); }
+
+.icon_lamp {
+  background-position: 0 0; }
+
+.icon_pling {
+  background-position: 0 -15px; }
+
+.icon_newfeature {
+  background-image: url("//img.imgsmail.ru/r/default/ico/ico__balloons_newfeature.png");
+  width: 55px;
+  height: 55px;
+  margin-left: -8px;
+  margin-top: -20px; }
+
+.icon_collector-promo, .icon_collector-folder-list {
+  width: 55px;
+  height: 55px;
+  margin-left: -8px;
+  margin-top: -20px; }
+
+.icon_collector-promo {
+  background-image: url("//img.imgsmail.ru/r/default/ico/ico__collector-promo.png");
+  background-position: 8px 3px; }
+
+.icon_cloud-promo {
+  width: 60px;
+  height: 60px;
+  margin-left: -5px;
+  margin-top: -18px;
+  background-image: url("//img.imgsmail.ru/r/default/ico/ico__cloud2.png");
+  background-position: 5px 5px; }
+
+.icon_collector-folder-list {
+  background-image: url("//img.imgsmail.ru/r/default/ico/ico__collector-promo.png");
+  background-position: 8px 3px; }
+
+.icon_medialine {
+  background-image: url("//img.imgsmail.ru/r/default/ico/ico__medialine.png");
+  width: 50px;
+  height: 42px;
+  margin: -10px 0 0; }
+
+.icon__balloon {
+  width: 48px;
+  height: 48px;
+  margin: -10px 0 0 -5px; }
+  .icon__balloon_theme-weather {
+    background-image: url("../images/icon_weather.svg"); }
+  .icon__balloon_theme-horoscope {
+    background-image: url("../images/icon_horoscope.svg"); }
+  .icon__balloon_theme-zenit {
+    background-image: url("../images/icon_zenit.svg"); }
+  .icon__balloon_theme-rio2016 {
+    background-image: url("../images/icon_rio2016.svg"); }
+  .icon__balloon_theme-cska {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon__fc-cska.svg"); }
+  .icon__balloon_filesearch {
+    background-image: url("../images/icon_filesearch.svg"); }
+  .icon__balloon_threads-promo {
+    background-image: url("../images/icon_threads.svg"); }
+  .icon__balloon_collector {
+    background-image: url("../images/icon_collector.svg"); }
+  .icon__balloon_compose-templates {
+    background-image: url("../images/icon_compose-templates.svg"); }
+  .icon__balloon_compose-templates-reply {
+    background-image: url("../images/icon_compose-templates-reply.svg"); }
+  .icon__balloon_archive-folder {
+    background-image: url("../images/icon_archive-folder.svg"); }
+  .icon__balloon_expand-archive {
+    background-image: url("../images/icon_expand-archive.svg"); }
+  .icon__balloon_cleaner {
+    background-image: url("../images/icon_cleaner.svg"); }
+  .icon__balloon_emoji {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_emoji.png"); }
+  .icon__balloon_images {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_images.png"); }
+  .icon__balloon_pins {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_pins.png"); }
+  .icon__balloon_nospam {
+    background-image: url("../images/icon_notspam.svg"); }
+  .icon__balloon_spam {
+    background-image: url("../images/icon_spam.svg"); }
+  .icon__balloon_edit-attach {
+    background-image: url("../images/icon_edit-attach.svg"); }
+  .icon__balloon_multiAuth {
+    background-image: url("//img.imgsmail.ru/mail/ru/images/ico/multi_auth.png");
+    width: 48px;
+    height: 51px; }
+  .icon__balloon_filters {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_filters.svg"); }
+  .icon__balloon_cloud {
+    background-image: url("../images/icon_cloud.svg"); }
+  .icon__balloon_html-signature {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_html-signature.svg"); }
+  .icon__balloon_push-notifications {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_push-notifications.svg");
+    margin: -2px 0 0 3px; }
+  .icon__balloon_bonus-promo {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_bonus-promo.svg");
+    width: 48px;
+    height: 48px;
+    margin: 9px 11px 0px 9px; }
+  .icon__balloon_bonus-promo-ny {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_bonus-promo-ny.svg"); }
+  .icon__balloon_compose-schedule {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_clock.svg");
+    background-size: 43px 43px;
+    background-position: 5px 3px; }
+  .icon__balloon_unsubscribe {
+    background-image: url("//img.imgsmail.ru/static.promo/balloon/icon/icon_unsubscribe.svg"); }
+  .icon__balloon_metathreads {
+    background-image: url("//img.imgsmail.ru/static.promo/announcement/promo/metathread-promo-info/icon.svg");
+    width: 48px;
+    height: 48px;
+    margin-top: 0;
+    margin-left: 5px; }
+  .icon__balloon_octavius {
+    background-image: url("//img.imgsmail.ru/static.promo/announcement/promo/octavius/icon.svg");
+    width: 48px;
+    height: 48px;
+    margin-top: 0;
+    margin-left: 5px; }
+
+.b-layer__container_anonim .b-promoter, .b-layer__container_anonim .b-promoter__slider___el {
+  background-color: #fff; }
+
+.b-layer__container_anonim .b-panel__header {
+  padding-left: 0;
+  padding-top: 22px; }
+
+.b-layer__container_anonim .b-panel__content__desc {
+  font-size: 15px; }
+
+.anonim__content {
+  width: 448px;
+  margin: 10px auto 25px;
+  font-size: 15px;
+  line-height: 1.33; }
+  .anonim__content .b-media__body {
+    vertical-align: middle;
+    text-align: left; }
+  .anonim__content .b-media__image {
+    padding-right: 16px; }
+
+.b-layer__container_fines {
+  min-width: 430px;
+  width: 430px; }
+  .b-layer__container_fines .b-panel__header {
+    padding-bottom: 5px; }
+  .b-layer__container_fines .b-panel__content {
+    margin: 0 20px 25px; }
+  .b-layer__container_fines .b-media {
+    padding: 15px 0; }
+  .b-layer__container_fines .b-media__image {
+    vertical-align: middle;
+    padding-right: 27px; }
+  .b-layer__container_fines .b-media__title {
+    font-size: 10px;
+    background-color: #ffdc30;
+    letter-spacing: 0.1em;
+    display: inline;
+    padding: 4px 8px; }
+  .b-layer__container_fines .b-media__text {
+    font-size: 15px;
+    line-height: 20px;
+    margin-top: 10px; }
+  .b-layer__container_fines .b-layer__controls {
+    text-align: center; }
+
+.b-layer__container_fines-share {
+  min-width: 430px;
+  width: 430px; }
+  .b-layer__container_fines-share .b-panel__header {
+    padding: 20px 20px 0;
+    text-align: center; }
+  .b-layer__container_fines-share .b-panel__header_success {
+    padding-bottom: 40px; }
+  .b-layer__container_fines-share .b-panel__header__image {
+    padding-bottom: 16px; }
+  .b-layer__container_fines-share .b-panel__header__comment {
+    font-size: 15px;
+    line-height: 20px; }
+  .b-layer__container_fines-share .b-panel__content {
+    margin: 0 20px 25px; }
+  .b-layer__container_fines-share .b-media__body {
+    display: block; }
+  .b-layer__container_fines-share .b-media__title {
+    line-height: 20px; }
+  .b-layer__container_fines-share .b-panel__content__comment {
+    color: #999;
+    line-height: 20px; }
+  .b-layer__container_fines-share .b-layer__controls {
+    text-align: center; }
+  .b-layer__container_fines-share .b-input__error {
+    color: #f44e4e;
+    display: none; }
+
+.b-datalist__empty__icon {
+  width: 96px;
+  height: 96px;
+  background-image: url("//img.imgsmail.ru/r/default/messagelist/datalist__empty__icon_mailru.604.svg");
+  background-repeat: no-repeat;
+  background-position: 0 -192px;
+  margin: 0 auto 24px auto; }
+
+.no-svg .b-datalist__empty__icon {
+  background-image: url("//img.imgsmail.ru/r/default/messagelist/datalist__empty__icon_mailru.604.png"); }
+
+.b-datalist__empty__icon_user,
+.b-datalist__empty__icon_archive {
+  background-position: 0 -192px; }
+
+.b-datalist__empty__icon_sent,
+.b-datalist__empty__icon_drafts,
+.b-datalist__empty__icon_templates {
+  background-position: 0 -96px; }
+
+.b-datalist__empty__icon_spam,
+.b-datalist__empty__icon_bulk {
+  background-position: 0 -480px; }
+
+.b-datalist__empty__icon_trash {
+  background-position: 0 -384px; }
+
+.b-datalist__empty__icon_search {
+  background-position: 0 -288px; }
+
+.b-datalist__empty__icon_anonim {
+  background-position: 0 -576px; }

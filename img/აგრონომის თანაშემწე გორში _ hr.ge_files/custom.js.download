@@ -1,0 +1,18 @@
+/****Custom JS Code *******/
+$(document).ready(function() {
+  /****Select Tag*******/
+
+
+/****Show list*******/  
+  function toggleIcon(e) {
+  $(e.target)
+    .prev('.panel-heading')
+    .find(".more-less")
+    .toggleClass('angle-double-upicon-hr angle-double-downicon-hr');
+  }
+  /****According Icons *******/  
+  $('.panel-group').on('hidden.bs.collapse', toggleIcon);
+  $('.panel-group').on('shown.bs.collapse', toggleIcon);
+      
+});
+

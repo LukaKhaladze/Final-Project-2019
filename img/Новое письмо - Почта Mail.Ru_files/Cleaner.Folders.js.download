@@ -1,0 +1,355 @@
+define(
+	'patron.v2.layer/cleaner/Cleaner.Folders',
+	[
+		'features',
+		'Promise',
+		'patron.v2.layer/cleaner/Cleaner.API',
+		'patron.v2.layer/cleaner/Cleaner.Radar',
+		'toolkit/b-toolkit/b-toolkit',
+		'patron/patron.Folders',
+		'patron.v2/langs/toolkit'
+	],
+function (
+	features,
+	Promise,
+	API,
+	Radar,
+	toolkit
+) {
+	var _lang = patron.toolkit.lang['b-layer']['mailbox-sort'];
+
+	var SYSTEM_FOLDERS = {
+			INBOX: 0,
+			BULK: 950,
+			SPAM: 950,
+			SENT: 500000,
+			DRAFTS: 500001,
+			TRASH: 500002,
+			MRIM: 500003,
+			MRIM_ARCH: 500005,
+			TEMPLATES: 500006,
+			TYPES: {
+				0: 'Inbox',
+				950: 'Spam',
+				500000: 'Sent',
+				500001: 'Drafts',
+				500002: 'Trash',
+				500003: 'MRIM',
+				500006: 'Templates'
+			},
+			RESTRICTED: {
+				0: 'Inbox',
+				500000: 'Sent',
+				500001: 'Drafts',
+				500002: 'Trash',
+				500003: 'MRIM',
+				500006: 'Templates',
+				500010: 'Archive'
+			}
+		};
+
+
+	/**
+	 * UI-data mixin with folders colors. Need to find its own place in the code.
+	 */
+	var _folderColors = (function () {
+		var colors = [
+				['#006db8', '#50c4fa'],
+				['#6b962e', '#b2e85d'],
+				['#c22512', '#ffab67']
+			],
+			current = 0;
+
+		return {
+			getColors: function() {
+				var color;
+
+				if (!colors[current]) {
+					current = 0;
+				}
+
+				color = colors[current];
+				current++;
+
+				return color;
+			},
+
+			setColor: function (color) {
+				Array.forEach(colors, function (colors, num) {
+					if (colors[0] == color) {
+						current = num;
+					}
+				});
+			},
+
+			getInboxColors: function () {
+				return ['#c7c7c7', '#e6e6e6'];
+			},
+
+			getSpamColors: function () {
+				return ['#f0c9c9', '#ffe5e5'];
+			},
+
+			getPhantomColors: function () {
+				return ['#c7c7c7', '#e6e6e6'];
+			}
+		};
+	})();
+
+	/**
+	 * UI-data mixin with default folders labels. Need to find its own place in the code.
+	 */
+	var _folderLabels = (function () {
+		var foldersLabels = { // Стандартные названия папок для фичи "Разбери ящик"
+				'folder_default_1': _lang['сommon.sales'],
+				'folder_default_2': _lang['сommon.maillists'],
+				'folder_default_3': _lang['сommon.social'],
+				'default':  _lang['сommon.newfolder']
+			},
+			types = {
+				'1': 'promotions',
+				'2': 'newsletters',
+				'3': 'social',
+				'default': 'user'
+			};
+
+		return {
+			getTitleByHash: function (hash) {
+				return foldersLabels[hash] ? foldersLabels[hash] : foldersLabels['default'];
+			},
+
+			_getTypeByCategory: function (category) {
+				category = category + '';
+				return types[category] ? types[category] : types['default'];
+			}
+		};
+	})();
+
+	var Folders = (function () {
+		var to = {};
+
+		return {
+
+			getSafe: function (id) {
+				return patron.Folders.getSafe(id);
+			},
+
+			get: function (id) {
+				return patron.Folders.get(id);
+			},
+
+			is: function (id, name) {
+				return SYSTEM_FOLDERS.TYPES[id] === name;
+			},
+
+			getByName: function (name) {
+				return Array.filter(patron.Folders.getAll(), function (folder) {
+					return folder.get('name') === name;
+				})[0];
+			},
+
+			getArchive: function () {
+				return patron.Folder.all.find(function (folder) {
+					return folder.isArchive();
+				})
+			},
+
+			isUseArchive: function () {
+				var archive = this.getArchive();
+
+				return features.has('mailboxsort-widget-archive') && (!archive || !patron.Folder.get(archive.get('parent')))
+			},
+
+			isRestricted: function (id) {
+				return id in SYSTEM_FOLDERS.RESTRICTED;
+			},
+
+			update: function (modelFolders, secondUse) {
+				var dfd = $.Deferred(),
+					firstUse = !secondUse;
+
+				this._reset();
+				Array.forEach(modelFolders, function (folder) {
+					// folder.title - тайтл, на который согласился юзер
+					// folder.id - id сущетсвующей на момент запуска утилиты с тайтлом, предложенным утилитой
+					// existFolder - существующая у пользователя папка, на момент создания фильтров
+
+					var existFolder = this.getByName(folder.title);
+
+					if (secondUse && folder.id && !existFolder) {
+						this._setToParams('update', folder);
+					} else if (firstUse && folder.id && !existFolder) {
+						// Была одна из предложенных папок на первом запуске, но ее переименовали - создаем новую, если такой уже нет
+						var tryFolderName = this.getSafe(folder.id).get('name');
+						if ( folder.title != tryFolderName) {
+							this._setToParams('create', folder);
+						}
+					} else if (!folder.id && !existFolder) {
+						// Не было предложенно папки и нет папки после изменения имени. Создаем.
+						this._setToParams('create', folder);
+					} else if (existFolder && existFolder.get('name') == folder.title && existFolder.id != folder.id) {
+						// Существующую предложенную утилитой папку (например: "Скидки") меняеяем на существующую пользовательскую папку
+						this._setToParams('change', existFolder);
+					}
+				}, this);
+
+				this._process(dfd);
+
+				return dfd.promise();
+			},
+
+			getArchiveFolderName: function () {
+				return toolkit.lang['b-layer']['mailbox-sort']['main.archive'];
+			},
+
+			getFolderWithArchiveName: function () {
+				return this.getByName(this.getArchiveFolderName());
+			},
+
+			/**
+			 * Add folder to api useable config object
+			 * @param {string} type
+			 * @param {string} folder
+			 * @private
+			 */
+			_setToParams: function (type, folder) {
+				var data;
+
+				switch (type) {
+					case 'update':
+						// folder === folder
+						data = {
+							name: folder.title,
+							id: folder.id
+						};
+						break;
+					case 'create':
+						// folder === folder
+						data = {
+							name: folder.title,
+							type: this._getTypeByCategory(folder.category_id),
+							parent: -1
+						};
+						break;
+					case 'change':
+						// folder === existFolder
+						data = {
+							name: folder.get('name'),
+							id: folder.id
+						};
+						break;
+				}
+				to[type].push(data);
+			},
+
+			/**
+			 * Reset api useable config object
+			 * @private
+			 */
+			_reset: function () {
+				to = { create: [], update: [], change: [] };
+			},
+
+			/**
+			 * Radar log
+			 * @param {Object} result
+			 * @private
+			 */
+			_log: function (result) {
+				Radar.send('folders', {
+					result: result,
+					create: to.create,
+					update: to.update,
+					change: to.change
+				});
+			},
+
+			_setNewestFoldersParent: function (parentId) {
+				to.create.map(function (folder) {
+					folder.parent = parentId;
+				});
+			},
+
+			/**
+			 * Do API actions and return needed results
+			 * @param dfd
+			 * @private
+			 */
+			_process: function (dfd) {
+				var promise;
+
+				if (this.isUseArchive() && to.create.length) {
+
+					var archive = this.getArchive();
+
+					if (archive) {
+
+						this._setNewestFoldersParent(archive.get('id'));
+
+						promise = Promise.resolve();
+
+					} else {
+
+						var folderWithArchiveName = this.getFolderWithArchiveName();
+
+						if (folderWithArchiveName) {
+
+							var parentId = folderWithArchiveName.get('id');
+
+							this._setNewestFoldersParent(parentId);
+
+							promise = API.folder('edit', [{
+								id: parentId,
+								archive: true
+							}]);
+
+						} else {
+
+							this._setNewestFoldersParent(patron.Folder.ARCHIVE);
+
+							promise = API.folder('add', [{
+								name: this.getArchiveFolderName(),
+								archive: true
+							}]);
+						}
+					}
+				} else {
+					promise = Promise.resolve();
+				}
+
+				promise.then(function () {
+					var actions = [
+							to.create.length && API.folder('add', to.create),
+							to.update.length && API.folder('edit', to.update)
+						];
+
+					$.when.apply($, actions).then(function (created, updated) {
+						var result = to.change.length ? to.change : [];
+
+						Array.forEach(Array.from(arguments), function (actionData) {
+							if (actionData && actionData.body) {
+								result = result.concat(Array.map(actionData.data, function (item, num) {
+									return {
+										id: actionData.body[num],
+										name: item.name
+									};
+								}));
+							}
+						});
+
+						this._log('success');
+						dfd.resolve(result);
+					}.bind(this),
+					function () {
+						this._log('fail');
+						dfd.reject(arguments);
+					}.bind(this));
+				}.bind(this));
+			}
+		};
+	})();
+
+	Object.extend(Folders, SYSTEM_FOLDERS, _folderColors, _folderLabels);
+
+	return Folders;
+});

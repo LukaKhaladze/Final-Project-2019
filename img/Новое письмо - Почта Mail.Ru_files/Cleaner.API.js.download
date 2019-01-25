@@ -1,0 +1,197 @@
+define('patron.v2.layer/cleaner/Cleaner.API', [
+	'patron/patron.API',
+	'patron.v2.layer/cleaner/Cleaner.API.Cache',
+	'features'
+	/*
+	 * Использовать Cleaner.API.mock только на windev!
+	, 'patron.v2.layer/cleaner/Cleaner.API.mock'
+	 */
+], function (
+	API,
+	Cache,
+	features,
+	mock
+) {
+	'use strict';
+
+	/**
+	 * Make request to API
+	 * @param options         {Object}   Necessary params and options
+	 * @param options.url     {string}   API url
+	 * @param options.data    {Object}   Data to send
+	 * @param options.prepare {function} Helper to prepare response body
+	 * @param options.cache   {boolean}  Flag for try to use localStorage cache
+	 * @returns {Deferred}
+	 * @private
+	 */
+	function _send (options) {
+		var dfd = $.Deferred(),
+			url = options.url,
+			data = options.data || {},
+			prepare = options.prepare,
+			cache = new Cache(url, options),
+			result;
+
+		if (options.cache && cache && cache.isOK()) {
+			result = $.isFunction(prepare) ?  prepare(cache.getBody()) : cache.getBody();
+			dfd.resolve(result);
+		} else {
+			API({
+				url: url,
+				type: 'POST',
+				data: Object.extend({
+					htmlencoded: false
+				}, data),
+				tokens: false,
+				complete: function (Response) {
+					if (mock) {
+						mock(Response);
+					}
+
+					cache.save(Response);
+					result = $.isFunction(prepare) ?  prepare(Response.getBody()) : Response.getBody();
+					dfd[Response.isOK() ? 'resolve' : 'reject'](result);
+				}
+			});
+		}
+
+		return dfd.promise();
+	}
+
+	/**
+	 * Prepare filters data for usage in API
+	 * @param data {Object} Data for add/edit filters
+	 * @returns {Object} Formated for API data
+	 * @private
+	 */
+	function _getFiltersSendData (data) {
+		return {
+			"filters": Array.map(data.senders, function (sender) {
+				return { //add filters
+					"id": sender.filter_id,
+					"enabled": true,
+					"applyToSpam": features.has('mailboxsort-filters-apply-to-spam'),
+					"continue": true,
+					"conditionsOr": true,
+					"isAutoFilter": true,
+					"conditions": Array.map(sender.emails, function (email) {
+						return {
+							"name": "from",
+							"not": false,
+							"value": email
+						};
+					}),
+					"actions": {
+						"move": sender.folder,
+						"read": data.makeread
+					}
+				};
+			}),
+			"apply_folders": data.apply_folders
+		};
+	}
+
+	/**
+	 * Invalidate LocalStorage Chache for mailliststat method
+	 * Usage: Letter content view "letter/ui/sortInformer"
+	 * @private
+	 */
+	function _invalidateMailliststatCache () {
+		var cache = new Cache('messages/services/mailliststat');
+		if (cache) {
+			cache.invalidate();
+		}
+	}
+
+	return {
+		/**
+		 * Get info about senders, and exists filters for them
+		 * @param cache {boolean}
+		 * @returns {Deferred}
+		 */
+		mailliststat: function (options) {
+			options = options || {};
+			options.url = 'messages/services/mailliststat';
+
+			return _send(options);
+		},
+
+		invalidateMailliststat: function () {
+			_invalidateMailliststatCache();
+		},
+
+		refuse: function (ids) {
+			_invalidateMailliststatCache();
+			return _send({
+				url: 'messages/services/mailliststat/update',
+				data: {
+					maillings_senders: Array.map(ids, function (sender_id) {
+						return {
+							id: sender_id,
+							autofilter_refuse: true
+						};
+					})
+				}
+			});
+		},
+
+		getFilters: function () {
+			return _send({
+				url: 'filters',
+				prepare: function (filters) {
+					return Array.filter(filters, function (item) {
+						return item.isAutoFilter;
+					});
+				}
+			});
+		},
+
+		addFilters: function (data) {
+			return _send({
+				url: 'filters/add',
+				data: _getFiltersSendData(data)
+			});
+		},
+
+		editFilters: function (data) {
+			return _send({
+				url: 'filters/edit',
+				data: _getFiltersSendData(data)
+			});
+		},
+
+		unapplyFilters: function (unapplyIds) {
+			return _send({
+				url: 'filters/unapply',
+				data: {
+					ids: unapplyIds
+				}
+			});
+		},
+
+		folder: function (method, foldersData) {
+			if (method === 'add') {
+				Array.forEach(foldersData, function (folder) {
+					Object.assign(folder, Object.assign({
+						parent: -1,
+						only_web: false
+					}, folder));
+				});
+			}
+
+			return _send({
+				url: 'folders/' + method, //'add' and 'edit' methods exists,
+				data: {
+					folders: foldersData
+				},
+				prepare: function (body) {
+					return {
+						method: method,
+						data: foldersData,
+						body: body
+					};
+				}
+			});
+		}
+	};
+});

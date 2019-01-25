@@ -1,0 +1,1 @@
+require(["jquery","ajs/pkg"],function(a,b){var $=a;define("patron.build/TransactionHeader",["2kit","transaction.header","Emitter","react.env"],function(a,b,c){return b});window.$=window.jQuery=a});

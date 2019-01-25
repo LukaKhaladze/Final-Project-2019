@@ -1,0 +1,102 @@
+define(
+	'patron.v2.layer/cleaner/Cleaner.Radar',
+	[
+		'patron.v2/flags/flags'
+	],
+function (flags) {
+	var utilFlag = flags.get('mailbox-sort'),
+		helpers = {
+			'show': function (data) {
+				return ['show', data.page];
+			},
+
+			'close': function (data) {
+				return ['close', data.page];
+			},
+
+			'offer': function (data) {
+				var folders = data.folders,
+					chain = ['offer'],
+					items;
+
+				Object.forEach(folders, function (folder) {
+					items = folder.items || [];
+
+					chain.push('cat_id|' + folder.category_id + '|' + items.length);
+				});
+
+				return chain;
+			},
+
+			'movesender': function (data) {
+				var chain = ['movesender'];
+
+				Array.forEach(['from', 'to'], function (operand) {
+					if (data[operand]) {
+						chain.push(operand + '|' + data[operand]);
+					}
+				});
+
+				return chain;
+			},
+
+			'deletefolder': function (data) {
+				return ['deletefolder', data.name];
+			},
+
+			'changefolder': function (data) {
+				return ['changefolder', data.name];
+			},
+
+			'folders': function (data) {
+				var chain = ['folders', data.result];
+
+				Array.forEach(['create', 'update', 'change'], function (operand) {
+					if (data[operand] && data[operand].length) {
+						chain.push(operand);
+						chain.push(Array.map(data[operand], function (folder) {
+							return folder.name;
+						}).join('|'));
+					}
+				});
+
+				return chain;
+			},
+
+			'filters': function (data) {
+				var chain = ['filters', data.result];
+
+				if (data.result !== 'revert') {
+					if (data.unapply && data.unapply.length) {
+						chain.push('unapply|' + data.unapply.length);
+					}
+
+					Array.forEach(['create', 'edit'], function (operand) {
+						if (data[operand] && data[operand].senders && data[operand].senders.length) {
+							chain.push(operand + '|' + data[operand].senders.length);
+						}
+					});
+				}
+
+				if (data.makeread) {
+					chain.push('makeread');
+				}
+
+				return chain;
+			}
+		};
+
+	return {
+		send: function (type, data) {
+			if (type in helpers) {
+				data = helpers[type](data);
+			} else {
+				data = type;
+			}
+
+			$.event.trigger('ui-abstract-action', {
+				chain: ['mailbox-sort', 'util'].concat(data)
+			});
+		}
+	};
+});

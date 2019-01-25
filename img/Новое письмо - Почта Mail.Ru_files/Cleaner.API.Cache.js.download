@@ -1,0 +1,94 @@
+/**
+ * @desc LocalStorage cache for some API endpoints (use only for Mailbox Cleaner)
+ */
+
+define('patron.v2.layer/cleaner/Cleaner.API.Cache', [
+	'patron.v2.utils/userStore',
+	'mrg-js-cookie'
+], function (userStore, jsCookie) {
+
+	var cacheStore = userStore('cleaner.api' + '|' + patron.useremail);
+	var settings = {
+		'messages/services/mailliststat': {
+			period: jsCookie.DAY
+		}
+	};
+
+	/**
+	 * Constructor for cahce instances
+	 * @param uri
+	 * @constructor
+	 */
+	function Cache (uri, options) {
+		options = options || {};
+
+		this.current = Date.now()/1000|0;
+		this.url = uri;
+		this.settings = $.extend(settings[this.url], options);
+		this.data = cacheStore.get(uri);
+	}
+
+	/**
+	 * Return true if we can use cache
+	 * @returns {boolean}
+	 */
+	Cache.prototype.isOK = function () {
+		return this.isExist() && !this.isExpire();
+	};
+
+	/**
+	 * We know about this endpoint and have data in the store
+	 * @returns {boolean}
+	 */
+	Cache.prototype.isExist = function () {
+		return !!this.settings && !!this.data;
+	};
+
+	/**
+	 * Data in the store doesn't expired yet.
+	 * @returns {boolean}
+	 */
+	Cache.prototype.isExpire = function () {
+		return this.current - this.data.last_modified > this.settings.period;
+	};
+
+	/**
+	 * Get cached data
+	 * @returns {*}
+	 */
+	Cache.prototype.getBody = function () {
+		return this.isOK() ? this.data.body : null;
+	};
+
+	/**
+	 * Return true if we need to save AJAX responsed data
+	 * @returns {boolean}
+	 */
+	Cache.prototype.toSave = function () {
+		return !!this.settings;
+	};
+
+	/**
+	 * Save data to localStorage
+	 * @param Response
+	 */
+	Cache.prototype.save = function (Response) {
+		if (Response.isOK() && this.toSave()) {
+			cacheStore.set(this.url, {
+				body: Response.getBody(),
+				last_modified: this.current
+			});
+			cacheStore.save();
+		}
+	};
+
+	/**
+	 * Clear data in localStorage
+	 */
+	Cache.prototype.invalidate = function () {
+		cacheStore.remove(this.url);
+		cacheStore.save();
+	};
+
+	return Cache;
+});

@@ -1,0 +1,39 @@
+﻿Oidc.Log.logger = console;
+
+var settings = {
+    authority: __authority,
+    client_id: __clientId,
+    redirect_uri: __redirectUri,
+    silent_redirect_uri: __silentRedirectUri,
+
+    response_type: 'id_token',
+    scope: 'openid profile',
+
+    filterProtocolClaims: true
+};
+
+var manager = new Oidc.UserManager(settings);
+var user;
+
+manager.events.addUserLoaded(function (loadedUser) {
+    user = loadedUser;
+    //display('.js-user', user);
+});
+
+$(document).ready(function () {
+    //console.clear();
+    console.log('auth begin');
+    manager.signinSilent().then(u => {
+        console.log(u);
+        if (u != null) {
+            //manager.signinRedirect();
+            window.location = '/externalsignin/?returnUrl=' + window.location.pathname+window.location.search;
+        }
+    })
+    .catch(error => { console.log(error) });
+    //manager
+    //    .signinPopup()
+    //    .catch(function (error) {
+    //        console.error('error while logging in through the popup', error);
+    //    });
+});
